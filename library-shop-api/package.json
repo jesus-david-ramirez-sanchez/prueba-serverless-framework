@@ -7,11 +7,7 @@
         "deploy": "serverless deploy",
         "deploy:dev": "serverless deploy --stage dev",
         "deploy:prod": "serverless deploy --stage prod",
-        "remove": "serverless remove",
-        "logs": "serverless logs -f createBook -t",
-        "logs:get": "serverless logs -f getBooks -t",
-        "logs:update": "serverless logs -f updateBook -t",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "remove": "serverless remove"
     },
     "keywords": ["serverless", "aws", "lambda", "javascript"],
     "author": "",
