@@ -14,7 +14,12 @@ src/
     │   ├── validations.js     # Validaciones específicas
     │   ├── database.js        # Operaciones DynamoDB
     │   └── responseHandler.js # Manejador de respuestas
-    ├── getBooks/      # Función para obtener libros
+    ├── getAllBooks/   # Función para obtener todos los libros
+    │   ├── index.js           # Handler principal
+    │   ├── validations.js     # Validaciones específicas
+    │   ├── database.js        # Operaciones DynamoDB
+    │   └── responseHandler.js # Manejador de respuestas
+    ├── getBookById/   # Función para obtener un libro por ID
     │   ├── index.js           # Handler principal
     │   ├── validations.js     # Validaciones específicas
     │   ├── database.js        # Operaciones DynamoDB
@@ -313,10 +318,16 @@ const response = CreateBookResponseHandler.success({ data: 'test' });
 - **Operaciones DB**: `createBook()`
 - **Respuestas**: 201 (creado), 400 (validación), 405 (método)
 
-### **getBooks**
+### **getAllBooks**
 - **Endpoint**: `GET /books`
-- **Validaciones**: Parámetros de query (id, author, title, limit, offset)
-- **Operaciones DB**: `getBookById()`, `getBooks()`
+- **Validaciones**: Parámetros de query (author, title, limit, offset)
+- **Operaciones DB**: `getAllBooks()`
+- **Respuestas**: 200 (éxito), 400 (validación), 405 (método)
+
+### **getBookById**
+- **Endpoint**: `GET /books/{id}`
+- **Validaciones**: ID en path parameters
+- **Operaciones DB**: `getBookById()`
 - **Respuestas**: 200 (éxito), 404 (no encontrado), 405 (método)
 
 ### **updateBook**

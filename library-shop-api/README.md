@@ -17,8 +17,8 @@ API REST para gestión de libros construida con Serverless Framework, AWS Lambda
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `POST` | `/books` | Crear un nuevo libro |
-| `GET` | `/books` | Obtener libros (con filtros opcionales) |
-| `GET` | `/books?id={id}` | Obtener libro por ID |
+| `GET` | `/books` | Obtener todos los libros (con filtros opcionales) |
+| `GET` | `/books/{id}` | Obtener un libro específico por ID |
 | `PUT` | `/books/{id}` | Actualizar libro por ID |
 | `DELETE` | `/books/{id}` | Eliminar libro por ID |
 
@@ -33,7 +33,12 @@ library-shop-api/
 │       │   ├── validations.js     # Validaciones específicas
 │       │   ├── database.js        # Operaciones DynamoDB
 │       │   └── responseHandler.js # Manejador de respuestas
-│       ├── getBooks/
+│       ├── getAllBooks/
+│       │   ├── index.js           # Handler principal
+│       │   ├── validations.js     # Validaciones específicas
+│       │   ├── database.js        # Operaciones DynamoDB
+│       │   └── responseHandler.js # Manejador de respuestas
+│       ├── getBookById/
 │       │   ├── index.js           # Handler principal
 │       │   ├── validations.js     # Validaciones específicas
 │       │   ├── database.js        # Operaciones DynamoDB
@@ -170,7 +175,7 @@ curl -X GET https://your-api-gateway-url/dev/books
 ### 3. Obtener Libro por ID
 
 ```bash
-curl -X GET "https://your-api-gateway-url/dev/books?id=book-id-here"
+curl -X GET "https://your-api-gateway-url/dev/books/book-id-here"
 ```
 
 ### 4. Buscar Libros por Autor
