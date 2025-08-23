@@ -1,6 +1,6 @@
 # serverless.yml
 service: library-shop-api
-frameworkVersion: '3'
+frameworkVersion: '4'
 
 provider:
   name: aws
@@ -37,6 +37,17 @@ functions:
       BOOKS_TABLE_NAME: ${self:provider.environment.BOOKS_TABLE_NAME}
       STAGE: ${self:provider.environment.STAGE}
 
+  getBooks:
+    handler: src/functions/getBooks/index.handler
+    events:
+      - http:
+          path: /books
+          method: get
+          cors: true
+    environment:
+      BOOKS_TABLE_NAME: ${self:provider.environment.BOOKS_TABLE_NAME}
+      STAGE: ${self:provider.environment.STAGE}
+
 resources:
   Resources:
     BooksTable:
@@ -65,10 +76,4 @@ resources:
           - Key: Service
             Value: ${self:service}
 
-plugins:
-  - serverless-offline
-
-custom:
-  serverless-offline:
-    httpPort: 3000
-    lambdaPort: 3002
+# Configuración para despliegue directo

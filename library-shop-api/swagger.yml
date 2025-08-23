@@ -25,6 +25,131 @@ servers:
 
 paths:
   /books:
+    get:
+      summary: Obtener libros con filtros
+      description: Obtiene libros de la base de datos con filtros opcionales por ID, autor o título
+      operationId: getBooks
+      tags:
+        - Books
+      parameters:
+        - name: id
+          in: query
+          description: ID específico del libro
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: author
+          in: query
+          description: Filtrar por autor (búsqueda parcial)
+          required: false
+          schema:
+            type: string
+        - name: title
+          in: query
+          description: Filtrar por título (búsqueda parcial)
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Número máximo de resultados (por defecto 10)
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          description: Offset para paginación (por defecto 0)
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        '200':
+          description: Libros obtenidos exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetBooksResponse'
+              examples:
+                all_books:
+                  summary: Todos los libros
+                  value:
+                    message: "Books retrieved successfully"
+                    books:
+                      - id: "550e8400-e29b-41d4-a716-446655440000"
+                        title: "El Señor de los Anillos"
+                        author: "J.R.R. Tolkien"
+                        isbn: "978-84-450-7054-9"
+                        price: 29.99
+                        description: "Una épica historia de fantasía"
+                        publishedDate: "1954-07-29"
+                        createdAt: "2024-01-15T10:30:00.000Z"
+                        updatedAt: "2024-01-15T10:30:00.000Z"
+                    totalCount: 1
+                    filters:
+                      id: null
+                      author: null
+                      title: null
+                    pagination:
+                      limit: 10
+                      offset: 0
+                    stage: "dev"
+                filtered_by_author:
+                  summary: Libros filtrados por autor
+                  value:
+                    message: "Books retrieved successfully"
+                    books:
+                      - id: "550e8400-e29b-41d4-a716-446655440000"
+                        title: "El Señor de los Anillos"
+                        author: "J.R.R. Tolkien"
+                        isbn: "978-84-450-7054-9"
+                        price: 29.99
+                        description: "Una épica historia de fantasía"
+                        publishedDate: "1954-07-29"
+                        createdAt: "2024-01-15T10:30:00.000Z"
+                        updatedAt: "2024-01-15T10:30:00.000Z"
+                    totalCount: 1
+                    filters:
+                      id: null
+                      author: "Tolkien"
+                      title: null
+                    pagination:
+                      limit: 10
+                      offset: 0
+                    stage: "dev"
+        '404':
+          description: Libro no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Not Found"
+                message: "Book not found with the provided ID"
+        '405':
+          description: Método no permitido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Method Not Allowed"
+                message: "Only GET method is allowed"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Internal Server Error"
+                message: "An error occurred while processing the request"
+
     post:
       summary: Crear un nuevo libro
       description: Crea un nuevo libro en la base de datos con validación robusta
@@ -247,6 +372,63 @@ components:
       required:
         - message
         - book
+        - stage
+
+    GetBooksResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensaje de confirmación
+          example: "Books retrieved successfully"
+        books:
+          type: array
+          items:
+            $ref: '#/components/schemas/Book'
+          description: Lista de libros encontrados
+        totalCount:
+          type: integer
+          description: Número total de libros encontrados
+          example: 1
+        filters:
+          type: object
+          properties:
+            id:
+              type: string
+              nullable: true
+              description: ID del libro filtrado
+            author:
+              type: string
+              nullable: true
+              description: Autor del libro filtrado
+            title:
+              type: string
+              nullable: true
+              description: Título del libro filtrado
+          description: Filtros aplicados en la búsqueda
+        pagination:
+          type: object
+          properties:
+            limit:
+              type: integer
+              description: Límite de resultados por página
+              example: 10
+            offset:
+              type: integer
+              description: Offset para paginación
+              example: 0
+          description: Información de paginación
+        stage:
+          type: string
+          enum: [dev, prod]
+          description: Stage del entorno
+          example: "dev"
+      required:
+        - message
+        - books
+        - totalCount
+        - filters
+        - pagination
         - stage
 
     ErrorResponse:

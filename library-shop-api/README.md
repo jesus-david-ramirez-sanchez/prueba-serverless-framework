@@ -120,6 +120,67 @@ npm run deploy
 
 ## Endpoints
 
+### Obtener Libros
+
+**GET** `/books`
+
+**Parámetros de query (opcionales):**
+- `id`: ID específico del libro (UUID)
+- `author`: Filtrar por autor (búsqueda parcial)
+- `title`: Filtrar por título (búsqueda parcial)
+- `limit`: Número máximo de resultados (por defecto 10, máximo 100)
+- `offset`: Offset para paginación (por defecto 0)
+
+**Ejemplos de uso:**
+
+```bash
+# Obtener todos los libros
+GET /books
+
+# Obtener un libro específico por ID
+GET /books?id=550e8400-e29b-41d4-a716-446655440000
+
+# Filtrar por autor
+GET /books?author=Tolkien
+
+# Filtrar por título
+GET /books?title=Señor
+
+# Con paginación
+GET /books?limit=5&offset=10
+```
+
+**Respuesta exitosa (200):**
+```json
+{
+  "message": "Books retrieved successfully",
+  "books": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "title": "El Señor de los Anillos",
+      "author": "J.R.R. Tolkien",
+      "isbn": "978-84-450-7054-9",
+      "price": 29.99,
+      "description": "Una épica historia de fantasía",
+      "publishedDate": "1954-07-29",
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "updatedAt": "2024-01-15T10:30:00.000Z"
+    }
+  ],
+  "totalCount": 1,
+  "filters": {
+    "id": null,
+    "author": "Tolkien",
+    "title": null
+  },
+  "pagination": {
+    "limit": 10,
+    "offset": 0
+  },
+  "stage": "dev"
+}
+```
+
 ### Crear Libro
 
 **POST** `/books`
@@ -163,7 +224,9 @@ npm run deploy
 library-shop-api/
 ├── src/
 │   └── functions/
-│       └── createBook/
+│       ├── createBook/
+│       │   └── index.js
+│       └── getBooks/
 │           └── index.js
 ├── serverless.yml
 ├── package.json
@@ -179,6 +242,7 @@ library-shop-api/
 - `npm run deploy:prod`: Desplegar a producción
 - `npm run remove`: Eliminar recursos de AWS
 - `npm run logs`: Ver logs de la función createBook
+- `npm run logs:get`: Ver logs de la función getBooks
 - `npm run docker:build`: Construir imagen Docker
 - `npm run docker:run`: Ejecutar contenedor Docker
 - `npm run docker:compose`: Ejecutar stack completo con Docker Compose
@@ -188,7 +252,7 @@ library-shop-api/
 
 Al desplegar, se crearán los siguientes recursos en AWS:
 
-- **Lambda Functions**: `createBook`
+- **Lambda Functions**: `createBook`, `getBooks`
 - **API Gateway**: Endpoints REST
 - **DynamoDB Table**: `library-shop-api-books-{stage}`
 - **IAM Roles**: Permisos necesarios para DynamoDB

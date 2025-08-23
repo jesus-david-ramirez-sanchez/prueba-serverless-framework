@@ -4,24 +4,19 @@
     "description": "API para gestión de libros con Serverless Framework",
     "main": "index.js",
     "scripts": {
-        "dev": "serverless offline",
         "deploy": "serverless deploy",
         "deploy:dev": "serverless deploy --stage dev",
         "deploy:prod": "serverless deploy --stage prod",
         "remove": "serverless remove",
         "logs": "serverless logs -f createBook -t",
-        "docker:build": "docker build -t library-shop-api .",
-        "docker:run": "docker run -p 9000:9000 library-shop-api",
-        "docker:compose": "docker-compose up --build",
-        "docker:compose:down": "docker-compose down",
+        "logs:get": "serverless logs -f getBooks -t",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": ["serverless", "aws", "lambda", "javascript"],
     "author": "",
     "license": "ISC",
     "devDependencies": {
-        "serverless": "^3.38.0",
-        "serverless-offline": "^13.3.0"
+        "serverless": "^4.18.1"
     },
     "dependencies": {
         "@aws-sdk/client-dynamodb": "^3.450.0",
