@@ -1,0 +1,301 @@
+openapi: 3.0.3
+info:
+  title: Library Shop API
+  description: API para gestión de libros construida con Serverless Framework y AWS Lambda
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@libraryshop.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor de desarrollo local
+  - url: https://{stage}.api.libraryshop.com
+    description: Servidor de producción
+    variables:
+      stage:
+        default: dev
+        enum:
+          - dev
+          - prod
+        description: Stage del entorno
+
+paths:
+  /books:
+    post:
+      summary: Crear un nuevo libro
+      description: Crea un nuevo libro en la base de datos con validación robusta
+      operationId: createBook
+      tags:
+        - Books
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookRequest'
+            examples:
+              libro_completo:
+                summary: Libro con todos los campos
+                value:
+                  title: "El Señor de los Anillos"
+                  author: "J.R.R. Tolkien"
+                  isbn: "978-84-450-7054-9"
+                  price: 29.99
+                  description: "Una épica historia de fantasía que sigue las aventuras de Frodo Bolsón"
+                  publishedDate: "1954-07-29"
+              libro_minimo:
+                summary: Libro con campos mínimos requeridos
+                value:
+                  title: "1984"
+                  author: "George Orwell"
+                  isbn: "978-84-397-2077-7"
+                  price: 15.50
+              libro_invalido:
+                summary: Ejemplo de libro con datos inválidos
+                value:
+                  title: ""
+                  author: "Autor Test"
+                  isbn: "123"
+                  price: -10
+                  publishedDate: "2030-01-01"
+      responses:
+        '201':
+          description: Libro creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateBookResponse'
+              examples:
+                success_response:
+                  summary: Respuesta exitosa
+                  value:
+                    message: "Book created successfully"
+                    book:
+                      id: "550e8400-e29b-41d4-a716-446655440000"
+                      title: "El Señor de los Anillos"
+                      author: "J.R.R. Tolkien"
+                      isbn: "978-84-450-7054-9"
+                      price: 29.99
+                      description: "Una épica historia de fantasía que sigue las aventuras de Frodo Bolsón"
+                      publishedDate: "1954-07-29"
+                      createdAt: "2024-01-15T10:30:00.000Z"
+                      updatedAt: "2024-01-15T10:30:00.000Z"
+                    stage: "dev"
+        '400':
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+              examples:
+                validation_error:
+                  summary: Error de validación múltiple
+                  value:
+                    error: "Validation Error"
+                    message: "Los datos proporcionados no son válidos"
+                    details:
+                      - field: "title"
+                        message: "El título no puede estar vacío"
+                      - field: "isbn"
+                        message: "El ISBN debe tener entre 10 y 17 caracteres y contener solo números y guiones"
+                      - field: "price"
+                        message: "El precio debe ser un número positivo"
+                      - field: "publishedDate"
+                        message: "La fecha de publicación no puede ser futura"
+                json_error:
+                  summary: Error de JSON inválido
+                  value:
+                    error: "Bad Request"
+                    message: "Invalid JSON in request body"
+        '405':
+          description: Método no permitido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Method Not Allowed"
+                message: "Only POST method is allowed"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Internal Server Error"
+                message: "An error occurred while creating the book"
+
+components:
+  schemas:
+    CreateBookRequest:
+      type: object
+      required:
+        - title
+        - author
+        - isbn
+        - price
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Título del libro
+          example: "El Señor de los Anillos"
+        author:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Autor del libro
+          example: "J.R.R. Tolkien"
+        isbn:
+          type: string
+          pattern: '^[0-9-]{10,17}$'
+          description: ISBN del libro (formato: números y guiones, 10-17 caracteres)
+          example: "978-84-450-7054-9"
+        price:
+          type: number
+          minimum: 0.01
+          maximum: 999999.99
+          multipleOf: 0.01
+          description: Precio del libro (máximo 2 decimales)
+          example: 29.99
+        description:
+          type: string
+          maxLength: 1000
+          description: Descripción opcional del libro
+          example: "Una épica historia de fantasía que sigue las aventuras de Frodo Bolsón"
+        publishedDate:
+          type: string
+          format: date
+          description: Fecha de publicación en formato ISO (YYYY-MM-DD)
+          example: "1954-07-29"
+      additionalProperties: false
+
+    Book:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID único del libro
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        title:
+          type: string
+          description: Título del libro
+          example: "El Señor de los Anillos"
+        author:
+          type: string
+          description: Autor del libro
+          example: "J.R.R. Tolkien"
+        isbn:
+          type: string
+          description: ISBN del libro
+          example: "978-84-450-7054-9"
+        price:
+          type: number
+          description: Precio del libro
+          example: 29.99
+        description:
+          type: string
+          nullable: true
+          description: Descripción del libro
+          example: "Una épica historia de fantasía que sigue las aventuras de Frodo Bolsón"
+        publishedDate:
+          type: string
+          format: date
+          nullable: true
+          description: Fecha de publicación
+          example: "1954-07-29"
+        createdAt:
+          type: string
+          format: date-time
+          description: Fecha de creación del registro
+          example: "2024-01-15T10:30:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Fecha de última actualización
+          example: "2024-01-15T10:30:00.000Z"
+      required:
+        - id
+        - title
+        - author
+        - isbn
+        - price
+        - createdAt
+        - updatedAt
+
+    CreateBookResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensaje de confirmación
+          example: "Book created successfully"
+        book:
+          $ref: '#/components/schemas/Book'
+        stage:
+          type: string
+          enum: [dev, prod]
+          description: Stage del entorno donde se creó el libro
+          example: "dev"
+      required:
+        - message
+        - book
+        - stage
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Tipo de error
+          example: "Bad Request"
+        message:
+          type: string
+          description: Mensaje descriptivo del error
+          example: "Request body is required"
+      required:
+        - error
+        - message
+
+    ValidationErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - type: object
+          properties:
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                    description: Campo que falló la validación
+                    example: "title"
+                  message:
+                    type: string
+                    description: Mensaje específico del error de validación
+                    example: "El título no puede estar vacío"
+                required:
+                  - field
+                  - message
+              description: Lista detallada de errores de validación
+          required:
+            - details
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API Key para autenticación (futuro)
+
+tags:
+  - name: Books
+    description: Operaciones relacionadas con la gestión de libros
