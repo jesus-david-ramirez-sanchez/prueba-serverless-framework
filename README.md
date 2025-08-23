@@ -1,106 +1,66 @@
-# Library Shop API
+# Library Shop API - Serverless Framework
 
-API para gestión de libros construida con Serverless Framework y AWS Lambda.
+API REST para gestión de libros construida con Serverless Framework, AWS Lambda y DynamoDB.
 
-## Características
+## 🚀 Características
 
-- ✅ Creación de libros con validación robusta usando Joi
-- ✅ Almacenamiento en DynamoDB
-- ✅ Variables de entorno por stage (dev/prod)
-- ✅ JavaScript (Node.js)
-- ✅ CORS habilitado
-- ✅ Validación de datos de entrada con mensajes en español
-- ✅ Documentación completa con Swagger/OpenAPI (YAML)
+- ✅ **Arquitectura Serverless** con AWS Lambda
+- ✅ **Base de datos NoSQL** con DynamoDB
+- ✅ **Validación de datos** con Joi
+- ✅ **Funciones independientes** con estructura modular
+- ✅ **CORS habilitado** para aplicaciones web
+- ✅ **Variables de entorno** por stage (dev/prod)
+- ✅ **Documentación OpenAPI** (Swagger)
 
-## Prerrequisitos
+## 📋 Endpoints Disponibles
 
-1. **Node.js** (versión 18 o superior)
-2. **AWS CLI** configurado con credenciales
-3. **Serverless Framework** instalado globalmente
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `POST` | `/books` | Crear un nuevo libro |
+| `GET` | `/books` | Obtener todos los libros (con filtros opcionales) |
+| `GET` | `/books/{id}` | Obtener un libro específico por ID |
+| `PUT` | `/books/{id}` | Actualizar libro por ID |
+| `DELETE` | `/books/{id}` | Eliminar libro por ID |
 
-```bash
-npm install -g serverless
+## 🏗️ Estructura del Proyecto
+
+```
+library-shop-api/
+├── src/
+│   └── functions/
+│       ├── createBook/
+│       │   ├── index.js           # Handler principal
+│       │   ├── validations.js     # Validaciones específicas
+│       │   ├── database.js        # Operaciones DynamoDB
+│       │   └── responseHandler.js # Manejador de respuestas
+│       ├── getAllBooks/
+│       │   ├── index.js           # Handler principal
+│       │   ├── validations.js     # Validaciones específicas
+│       │   ├── database.js        # Operaciones DynamoDB
+│       │   └── responseHandler.js # Manejador de respuestas
+│       ├── getBookById/
+│       │   ├── index.js           # Handler principal
+│       │   ├── validations.js     # Validaciones específicas
+│       │   ├── database.js        # Operaciones DynamoDB
+│       │   └── responseHandler.js # Manejador de respuestas
+│       ├── updateBook/
+│       │   ├── index.js           # Handler principal
+│       │   ├── validations.js     # Validaciones específicas
+│       │   ├── database.js        # Operaciones DynamoDB
+│       │   └── responseHandler.js # Manejador de respuestas
+│       └── deleteBook/
+│           ├── index.js           # Handler principal
+│           ├── validations.js     # Validaciones específicas
+│           ├── database.js        # Operaciones DynamoDB
+│           └── responseHandler.js # Manejador de respuestas
+├── serverless.yml
+├── package.json
+├── swagger.yml
+├── dynamodb-schema.md
+└── README.md
 ```
 
-## Instalación
-
-1. Clona el repositorio
-2. Instala las dependencias:
-
-```bash
-cd library-shop-api
-npm install
-```
-
-## Configuración de AWS
-
-Asegúrate de tener configurado AWS CLI con un perfil:
-
-```bash
-aws configure --profile default
-```
-
-O si ya tienes un perfil configurado, actualiza el `serverless.yml` con el nombre de tu perfil.
-
-## Variables de Entorno
-
-El proyecto utiliza las siguientes variables de entorno que se configuran automáticamente:
-
-- `STAGE`: El stage actual (dev/prod)
-- `BOOKS_TABLE_NAME`: Nombre de la tabla DynamoDB (se genera automáticamente)
-
-## Despliegue Exitoso ✅
-
-La API está desplegada y funcionando en AWS:
-
-**URL Base:** `https://so95kgzpoc.execute-api.us-east-1.amazonaws.com/dev`
-
-**Endpoints disponibles:**
-- **POST** `/books` - Crear libro
-- **GET** `/books` - Obtener libros (con filtros opcionales)
-- **PUT** `/books/{id}` - Actualizar libro por ID
-
-**Ejemplo de uso:**
-```bash
-# Crear un libro
-curl -X POST https://so95kgzpoc.execute-api.us-east-1.amazonaws.com/dev/books \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Test Book","author":"Test Author","isbn":"1234567890","price":19.99}'
-
-# Obtener todos los libros
-curl https://so95kgzpoc.execute-api.us-east-1.amazonaws.com/dev/books
-
-# Filtrar por autor
-curl "https://so95kgzpoc.execute-api.us-east-1.amazonaws.com/dev/books?author=Test"
-
-# Actualizar un libro
-curl -X PUT https://so95kgzpoc.execute-api.us-east-1.amazonaws.com/dev/books/7b34defa-f6bb-40e3-b50e-ebb3d751c5bc \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Updated Book Title","price":25.99}'
-
-## Ejecutar con Docker
-
-### Opción 1: Solo la Lambda
-```bash
-# Construir la imagen
-npm run docker:build
-
-# Ejecutar el contenedor
-npm run docker:run
-```
-
-### Opción 2: Con DynamoDB local
-```bash
-# Ejecutar todo el stack (Lambda + DynamoDB local)
-npm run docker:compose
-
-# Detener los servicios
-npm run docker:compose:down
-```
-
-La Lambda estará disponible en `http://localhost:9000` y DynamoDB en `http://localhost:8000`
-
-## Arquitectura del Proyecto
+## 🏗️ Arquitectura del Proyecto
 
 El proyecto sigue una arquitectura modular donde cada función Lambda es completamente independiente:
 
@@ -138,13 +98,116 @@ Cada función Lambda tiene su propia carpeta con todos los archivos necesarios:
 - ✅ **Escalabilidad por función**
 - ✅ **Sin dependencias compartidas**
 
-## Documentación
+## 🛠️ Instalación y Configuración
 
-### API Documentation
-La documentación de la API está disponible en el archivo `swagger.yml` en formato OpenAPI 3.0.3.
+### Prerrequisitos
+
+- Node.js 20.x o superior
+- AWS CLI configurado
+- Serverless Framework instalado globalmente
+
+```bash
+npm install -g serverless
+```
+
+### Instalación
+
+1. **Clonar el repositorio**
+```bash
+git clone <repository-url>
+cd library-shop-api
+```
+
+2. **Instalar dependencias**
+```bash
+npm install
+```
+
+3. **Configurar AWS CLI** (si no está configurado)
+```bash
+aws configure
+```
+
+## 🚀 Despliegue
+
+### Despliegue en Desarrollo
+
+```bash
+npm run deploy:dev
+```
+
+### Despliegue en Producción
+
+```bash
+npm run deploy:prod
+```
+
+### Variables de Entorno
+
+El proyecto utiliza variables de entorno que se configuran automáticamente:
+
+- `STAGE`: Stage de despliegue (dev/prod)
+- `BOOKS_TABLE_NAME`: Nombre de la tabla DynamoDB
+
+## 📖 Uso de la API
+
+Para ejemplos detallados de consumo de la API, consulta la documentación completa en el archivo `swagger.yml` que incluye:
+
+- **Ejemplos de requests** para cada endpoint
+- **Esquemas de datos** de entrada y salida
+- **Códigos de respuesta** y manejo de errores
+- **Parámetros de query** y path parameters
+- **Headers requeridos** y opcionales
+
+## 📊 Estructura de Datos
+
+### Libro
+
+```json
+{
+  "id": "uuid-generado",
+  "title": "Título del libro",
+  "author": "Nombre del autor",
+  "isbn": "978-84-450-7054-9",
+  "price": 29.99,
+  "description": "Descripción opcional",
+  "publishedDate": "1954-07-29",
+  "createdAt": "2024-01-15T10:30:00.000Z",
+  "updatedAt": "2024-01-15T10:30:00.000Z"
+}
+```
+
+### Parámetros de Búsqueda (GET /books)
+
+- `id`: ID específico del libro
+- `author`: Filtrar por autor (búsqueda parcial)
+- `title`: Filtrar por título (búsqueda parcial)
+- `limit`: Límite de resultados (1-100, default: 10)
+- `offset`: Offset para paginación (default: 0)
+
+## 🔧 Scripts Disponibles
+
+```bash
+# Despliegue en desarrollo
+npm run deploy:dev
+
+# Despliegue en producción
+npm run deploy:prod
+
+# Ver logs en tiempo real
+npm run logs:dev
+
+# Eliminar despliegue
+npm run remove:dev
+```
+
+## 📚 Documentación
 
 ### Database Schema
 La estructura completa de la tabla DynamoDB está documentada en `dynamodb-schema.md`, incluyendo:
+- Esquema de la tabla y índices
+- Estructura de datos de los libros
+- Configuración de DynamoDB
 
 ### Architecture
 La arquitectura del proyecto está documentada en `ARCHITECTURE.md`, incluyendo:
@@ -153,260 +216,65 @@ La arquitectura del proyecto está documentada en `ARCHITECTURE.md`, incluyendo:
 - Flujo de datos y desarrollo
 - Convenciones de código
 - Guías para testing
-- Esquema de la tabla y índices
-- Estructura de datos de los libros
-- Operaciones soportadas
-- Comandos AWS CLI para consultas
-- Consideraciones de rendimiento y optimizaciones futuras
 
-Esta documentación incluye:
-- Esquemas completos de request/response
-- Ejemplos de uso para casos válidos e inválidos
-- Códigos de error detallados con ejemplos
-- Validaciones que coinciden con las reglas de Joi
-- Especificación completa de la API
+### API Documentation
+La documentación completa de la API está disponible en formato OpenAPI/Swagger en `swagger.yml`.
 
-Puedes usar esta documentación con:
-- Herramientas de generación de código
-- Validadores de API
-- Herramientas de testing
-- Cualquier cliente que soporte OpenAPI
+## 🧪 Testing
 
-## Despliegue
+Para ejemplos de testing y casos de uso, consulta la documentación Swagger que incluye ejemplos de requests y respuestas para cada endpoint.
 
-### Despliegue a Desarrollo
+## 🔒 Seguridad
 
-```bash
-npm run deploy:dev
-```
+- **Validación de entrada**: Todos los datos se validan con Joi
+- **CORS configurado**: Para aplicaciones web
+- **IAM Roles**: Permisos mínimos necesarios
+- **Variables de entorno**: Configuración segura
 
-### Despliegue a Producción
+## 🚨 Manejo de Errores
 
-```bash
-npm run deploy:prod
-```
+La API retorna códigos de estado HTTP apropiados:
 
-### Despliegue General
+- `200`: Operación exitosa
+- `201`: Recurso creado exitosamente
+- `400`: Error de validación
+- `404`: Recurso no encontrado
+- `405`: Método no permitido
+- `500`: Error interno del servidor
 
-```bash
-npm run deploy
-```
+### Formato de Error
 
-## Endpoints
-
-### Obtener Libros
-
-**GET** `/books`
-
-**Parámetros de query (opcionales):**
-- `id`: ID específico del libro (UUID)
-- `author`: Filtrar por autor (búsqueda parcial)
-- `title`: Filtrar por título (búsqueda parcial)
-- `limit`: Número máximo de resultados (por defecto 10, máximo 100)
-- `offset`: Offset para paginación (por defecto 0)
-
-**Ejemplos de uso:**
-
-```bash
-# Obtener todos los libros
-GET /books
-
-# Obtener un libro específico por ID
-GET /books?id=550e8400-e29b-41d4-a716-446655440000
-
-# Filtrar por autor
-GET /books?author=Tolkien
-
-# Filtrar por título
-GET /books?title=Señor
-
-# Con paginación
-GET /books?limit=5&offset=10
-```
-
-**Respuesta exitosa (200):**
 ```json
 {
-  "message": "Books retrieved successfully",
-  "books": [
+  "error": "Validation Error",
+  "message": "Los datos proporcionados no son válidos",
+  "details": [
     {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "title": "El Señor de los Anillos",
-      "author": "J.R.R. Tolkien",
-      "isbn": "978-84-450-7054-9",
-      "price": 29.99,
-      "description": "Una épica historia de fantasía",
-      "publishedDate": "1954-07-29",
-      "createdAt": "2024-01-15T10:30:00.000Z",
-      "updatedAt": "2024-01-15T10:30:00.000Z"
+      "field": "title",
+      "message": "El título no puede estar vacío"
     }
-  ],
-  "totalCount": 1,
-  "filters": {
-    "id": null,
-    "author": "Tolkien",
-    "title": null
-  },
-  "pagination": {
-    "limit": 10,
-    "offset": 0
-  },
-  "stage": "dev"
+  ]
 }
 ```
 
-### Actualizar Libro
+## 📈 Monitoreo
 
-**PUT** `/books/{id}`
+- **CloudWatch Logs**: Logs automáticos de todas las funciones
+- **Métricas**: Métricas de rendimiento automáticas
+- **Trazabilidad**: Request ID en todas las respuestas
 
-**Parámetros de path:**
-- `id`: ID del libro a actualizar (UUID)
-
-**Body (campos opcionales):**
-```json
-{
-  "title": "Nuevo título del libro",
-  "author": "Nuevo autor",
-  "isbn": "978-84-450-7054-9",
-  "price": 29.99,
-  "description": "Nueva descripción",
-  "publishedDate": "1954-07-29"
-}
-```
-
-**Respuesta exitosa (200):**
-```json
-{
-  "message": "Book updated successfully",
-  "book": {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "title": "Nuevo título del libro",
-    "author": "J.R.R. Tolkien",
-    "isbn": "978-84-450-7054-9",
-    "price": 29.99,
-    "description": "Nueva descripción",
-    "publishedDate": "1954-07-29",
-    "createdAt": "2024-01-15T10:30:00.000Z",
-    "updatedAt": "2024-01-15T11:45:00.000Z"
-  },
-  "updatedFields": ["title", "price", "description"],
-  "stage": "dev"
-}
-```
-
-### Crear Libro
-
-**POST** `/books`
-
-**Body:**
-```json
-{
-  "title": "El Señor de los Anillos",
-  "author": "J.R.R. Tolkien",
-  "isbn": "978-84-450-7054-9",
-  "price": 29.99,
-  "description": "Una épica historia de fantasía",
-  "publishedDate": "1954-07-29"
-}
-```
-
-**Respuesta exitosa (201):**
-```json
-{
-  "message": "Book created successfully",
-  "book": {
-    "id": "uuid-generado",
-    "title": "El Señor de los Anillos",
-    "author": "J.R.R. Tolkien",
-    "isbn": "978-84-450-7054-9",
-    "price": 29.99,
-    "description": "Una épica historia de fantasía",
-    "publishedDate": "1954-07-29",
-    "createdAt": "2024-01-15T10:30:00.000Z",
-    "updatedAt": "2024-01-15T10:30:00.000Z"
-  },
-  "stage": "dev"
-}
-```
-
-
-
-## Estructura del Proyecto
-
-```
-library-shop-api/
-├── src/
-│   └── functions/
-│       ├── createBook/
-│       │   ├── index.js
-│       │   ├── validations.js
-│       │   ├── database.js
-│       │   └── responseHandler.js
-│       ├── getBooks/
-│       │   ├── index.js
-│       │   ├── validations.js
-│       │   ├── database.js
-│       │   └── responseHandler.js
-│       └── updateBook/
-│           ├── index.js
-│           ├── validations.js
-│           ├── database.js
-│           └── responseHandler.js
-├── serverless.yml
-├── package.json
-├── swagger.yml
-├── dynamodb-schema.md
-└── README.md
-```
-
-## Comandos Útiles
-
-
-- `npm run deploy`: Desplegar a AWS
-- `npm run deploy:dev`: Desplegar a desarrollo
-- `npm run deploy:prod`: Desplegar a producción
-- `npm run remove`: Eliminar recursos de AWS
-- `npm run logs`: Ver logs de la función createBook
-- `npm run logs:get`: Ver logs de la función getBooks
-- `npm run logs:update`: Ver logs de la función updateBook
-- `npm run docker:build`: Construir imagen Docker (no disponible en esta versión)
-- `npm run docker:run`: Ejecutar contenedor Docker (no disponible en esta versión)
-- `npm run docker:compose`: Ejecutar stack completo con Docker Compose (no disponible en esta versión)
-
-
-## Recursos Creados
-
-Al desplegar, se crearán los siguientes recursos en AWS:
-
-- **Lambda Functions**: `createBook`, `getBooks`, `updateBook`
-- **API Gateway**: Endpoints REST
-- **DynamoDB Table**: `library-shop-api-books-{stage}`
-- **IAM Roles**: Permisos necesarios para DynamoDB
-
-## Troubleshooting
-
-### Error de permisos AWS
-Asegúrate de que tu usuario AWS tenga permisos para:
-- Lambda
-- API Gateway
-- DynamoDB
-- IAM (para crear roles)
-
-
-
-### Error de conexión a DynamoDB
-Verifica que la región en `serverless.yml` coincida con tu configuración de AWS.
-
-## Costos
-
-- **Lambda**: Pay per request (muy económico para desarrollo)
-- **DynamoDB**: Pay per request (gratis hasta 25GB)
-- **API Gateway**: $3.50 por millón de requests
-
-## Contribución
+## 🤝 Contribución
 
 1. Fork el proyecto
-2. Crea una rama para tu feature
-3. Commit tus cambios
-4. Push a la rama
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
 5. Abre un Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+---
+
+**Desarrollado con ❤️ usando Serverless Framework y AWS**
