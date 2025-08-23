@@ -48,6 +48,17 @@ functions:
       BOOKS_TABLE_NAME: ${self:provider.environment.BOOKS_TABLE_NAME}
       STAGE: ${self:provider.environment.STAGE}
 
+  updateBook:
+    handler: src/functions/updateBook/index.handler
+    events:
+      - http:
+          path: /books/{id}
+          method: put
+          cors: true
+    environment:
+      BOOKS_TABLE_NAME: ${self:provider.environment.BOOKS_TABLE_NAME}
+      STAGE: ${self:provider.environment.STAGE}
+
 resources:
   Resources:
     BooksTable:
