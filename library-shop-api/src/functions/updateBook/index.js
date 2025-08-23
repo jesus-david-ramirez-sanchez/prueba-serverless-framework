@@ -1,6 +1,7 @@
 const { validateUpdateBookData, validateBookId } = require('./validations');
 const { getBookById, updateBook } = require('./database');
 const UpdateBookResponseHandler = require('./responseHandler');
+const { processDateFields } = require('../../utils/dateUtils');
 
 exports.handler = async (event) => {
     try {
@@ -49,6 +50,9 @@ exports.handler = async (event) => {
             return UpdateBookResponseHandler.validationError(validationError.details);
         }
 
+        // Procesar las fechas antes de enviar a la base de datos
+        const processedData = processDateFields(validatedData);
+
         // Verificar que el libro existe antes de actualizar
         try {
             const existingBook = await getBookById(tableName, bookId);
@@ -64,7 +68,7 @@ exports.handler = async (event) => {
         // Actualizar en la base de datos
         let updatedBook;
         try {
-            updatedBook = await updateBook(tableName, bookId, validatedData);
+            updatedBook = await updateBook(tableName, bookId, processedData);
         } catch (error) {
             console.error('Error updating book:', error);
             return UpdateBookResponseHandler.internalServerError();

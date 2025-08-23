@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 const { validateCreateBookData } = require('./validations');
 const { createBook } = require('./database');
 const CreateBookResponseHandler = require('./responseHandler');
+const { processDateFields } = require('../../utils/dateUtils');
 
 exports.handler = async (event) => {
     try {
@@ -40,10 +41,13 @@ exports.handler = async (event) => {
 
         // Preparar el objeto del libro
         const now = new Date().toISOString();
+        
+        // Procesar las fechas antes de crear el objeto
+        const processedData = processDateFields(validatedData);
+        
         const book = {
             id: uuidv4(),
-            publishedDate: new Date(validatedData.publishedDate).toISOString(),
-            ...validatedData,
+            ...processedData,
             createdAt: now,
             updatedAt: now
         };
