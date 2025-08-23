@@ -49,15 +49,29 @@ El proyecto utiliza las siguientes variables de entorno que se configuran autom�
 - `STAGE`: El stage actual (dev/prod)
 - `BOOKS_TABLE_NAME`: Nombre de la tabla DynamoDB (se genera automáticamente)
 
-## Desarrollo Local
+## Despliegue Exitoso ✅
 
-Para ejecutar la API localmente:
+La API está desplegada y funcionando en AWS:
 
+**URL Base:** `https://so95kgzpoc.execute-api.us-east-1.amazonaws.com/dev`
+
+**Endpoints disponibles:**
+- **POST** `/books` - Crear libro
+- **GET** `/books` - Obtener libros (con filtros opcionales)
+
+**Ejemplo de uso:**
 ```bash
-npm run dev
-```
+# Crear un libro
+curl -X POST https://so95kgzpoc.execute-api.us-east-1.amazonaws.com/dev/books \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Test Book","author":"Test Author","isbn":"1234567890","price":19.99}'
 
-Esto iniciará el servidor en `http://localhost:3000`
+# Obtener todos los libros
+curl https://so95kgzpoc.execute-api.us-east-1.amazonaws.com/dev/books
+
+# Filtrar por autor
+curl "https://so95kgzpoc.execute-api.us-east-1.amazonaws.com/dev/books?author=Test"
+```
 
 ## Ejecutar con Docker
 
@@ -243,9 +257,9 @@ library-shop-api/
 - `npm run remove`: Eliminar recursos de AWS
 - `npm run logs`: Ver logs de la función createBook
 - `npm run logs:get`: Ver logs de la función getBooks
-- `npm run docker:build`: Construir imagen Docker
-- `npm run docker:run`: Ejecutar contenedor Docker
-- `npm run docker:compose`: Ejecutar stack completo con Docker Compose
+- `npm run docker:build`: Construir imagen Docker (no disponible en esta versión)
+- `npm run docker:run`: Ejecutar contenedor Docker (no disponible en esta versión)
+- `npm run docker:compose`: Ejecutar stack completo con Docker Compose (no disponible en esta versión)
 
 
 ## Recursos Creados

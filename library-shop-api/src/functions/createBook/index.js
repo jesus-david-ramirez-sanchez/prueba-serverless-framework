@@ -127,15 +127,15 @@ exports.handler = async (event) => {
         // Crear el objeto del libro con los datos validados
         const now = new Date().toISOString();
         const book = {
-            id: uuidv4(),
-            title: value.title,
-            author: value.author,
-            isbn: value.isbn,
-            price: value.price,
-            description: value.description,
-            publishedDate: value.publishedDate,
-            createdAt: now,
-            updatedAt: now
+          id: uuidv4(),
+          title: value.title,
+          author: value.author,
+          isbn: value.isbn,
+          price: value.price,
+          description: value.description,
+          publishedDate: new Date(value.publishedDate).toISOString(),
+          createdAt: now,
+          updatedAt: now,
         };
 
         // Guardar en DynamoDB
