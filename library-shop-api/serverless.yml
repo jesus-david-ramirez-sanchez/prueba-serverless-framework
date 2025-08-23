@@ -37,11 +37,22 @@ functions:
       BOOKS_TABLE_NAME: ${self:provider.environment.BOOKS_TABLE_NAME}
       STAGE: ${self:provider.environment.STAGE}
 
-  getBooks:
-    handler: src/functions/getBooks/index.handler
+  getAllBooks:
+    handler: src/functions/getAllBooks/index.handler
     events:
       - http:
           path: /books
+          method: get
+          cors: true
+    environment:
+      BOOKS_TABLE_NAME: ${self:provider.environment.BOOKS_TABLE_NAME}
+      STAGE: ${self:provider.environment.STAGE}
+
+  getBookById:
+    handler: src/functions/getBookById/index.handler
+    events:
+      - http:
+          path: /books/{id}
           method: get
           cors: true
     environment:

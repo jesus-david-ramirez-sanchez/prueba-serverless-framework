@@ -1,7 +1,7 @@
 /**
- * Manejador de respuestas para la función getBooks
+ * Manejador de respuestas para la función getAllBooks
  */
-class GetBooksResponseHandler {
+class GetAllBooksResponseHandler {
     /**
      * Respuesta exitosa
      * @param {Object} data - Datos de la respuesta
@@ -68,14 +68,6 @@ class GetBooksResponseHandler {
     }
 
     /**
-     * Respuesta de error de recurso no encontrado
-     * @returns {Object} - Respuesta HTTP
-     */
-    static notFound() {
-        return this.error(404, 'Not Found', 'Book not found with the provided ID');
-    }
-
-    /**
      * Respuesta de error interno del servidor
      * @param {string} message - Mensaje de error
      * @returns {Object} - Respuesta HTTP
@@ -85,4 +77,4 @@ class GetBooksResponseHandler {
     }
 }
 
-module.exports = GetBooksResponseHandler;
+module.exports = GetAllBooksResponseHandler;

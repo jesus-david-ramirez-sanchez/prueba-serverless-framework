@@ -1,14 +1,7 @@
 const Joi = require('joi');
 
-// Esquema para validar ID de libro
-const bookIdSchema = Joi.string().required().messages({
-    'string.empty': 'El ID del libro es requerido',
-    'any.required': 'El ID del libro es requerido'
-});
-
 // Esquema para parámetros de query en búsqueda
 const searchParamsSchema = Joi.object({
-    id: Joi.string().optional(),
     author: Joi.string().optional(),
     title: Joi.string().optional(),
     limit: Joi.number().integer().min(1).max(100).default(10).optional().messages({
@@ -47,29 +40,7 @@ function validateSearchParams(data) {
     return value;
 }
 
-// Función para validar ID de libro
-function validateBookId(id) {
-    const { error, value } = bookIdSchema.validate(id);
-
-    if (error) {
-        const errorDetails = error.details.map(detail => ({
-            field: detail.path.join('.'),
-            message: detail.message
-        }));
-
-        throw {
-            type: 'VALIDATION_ERROR',
-            message: 'El ID del libro no es válido',
-            details: errorDetails
-        };
-    }
-
-    return value;
-}
-
 module.exports = {
     searchParamsSchema,
-    bookIdSchema,
-    validateSearchParams,
-    validateBookId
+    validateSearchParams
 };

@@ -1,28 +1,12 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, GetCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
+const { DynamoDBDocumentClient, ScanCommand } = require('@aws-sdk/lib-dynamodb');
 
 // Configuración del cliente DynamoDB
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
 /**
- * Obtener un libro por ID
- * @param {string} tableName - Nombre de la tabla
- * @param {string} id - ID del libro
- * @returns {Promise<Object|null>} - Libro encontrado o null
- */
-async function getBookById(tableName, id) {
-    const command = new GetCommand({
-        TableName: tableName,
-        Key: { id: id }
-    });
-
-    const result = await docClient.send(command);
-    return result.Item || null;
-}
-
-/**
- * Obtener libros con filtros
+ * Obtener todos los libros con filtros opcionales
  * @param {string} tableName - Nombre de la tabla
  * @param {Object} filters - Filtros de búsqueda
  * @param {string} filters.author - Filtrar por autor
@@ -31,7 +15,7 @@ async function getBookById(tableName, id) {
  * @param {Object} filters.exclusiveStartKey - Clave para paginación
  * @returns {Promise<Object>} - Resultados de la búsqueda
  */
-async function getBooks(tableName, filters = {}) {
+async function getAllBooks(tableName, filters = {}) {
     const { author, title, limit = 10, exclusiveStartKey } = filters;
 
     let scanParams = {
@@ -74,6 +58,5 @@ async function getBooks(tableName, filters = {}) {
 }
 
 module.exports = {
-    getBookById,
-    getBooks
+    getAllBooks
 };
