@@ -59,6 +59,17 @@ functions:
       BOOKS_TABLE_NAME: ${self:provider.environment.BOOKS_TABLE_NAME}
       STAGE: ${self:provider.environment.STAGE}
 
+  deleteBook:
+    handler: src/functions/deleteBook/index.handler
+    events:
+      - http:
+          path: /books/{id}
+          method: delete
+          cors: true
+    environment:
+      BOOKS_TABLE_NAME: ${self:provider.environment.BOOKS_TABLE_NAME}
+      STAGE: ${self:provider.environment.STAGE}
+
 resources:
   Resources:
     BooksTable:
