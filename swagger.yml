@@ -150,105 +150,6 @@ paths:
                  error: "Internal Server Error"
                  message: "An error occurred while processing the request"
 
-  /books/{id}:
-    put:
-      summary: Actualizar un libro existente
-      description: Actualiza un libro existente por su ID con validación de campos opcionales
-      operationId: updateBook
-      tags:
-        - Books
-      parameters:
-        - name: id
-          in: path
-          description: ID del libro a actualizar
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateBookRequest'
-            examples:
-              actualizar_titulo:
-                summary: Actualizar solo el título
-                value:
-                  title: "El Señor de los Anillos - Edición Especial"
-              actualizar_precio:
-                summary: Actualizar precio y descripción
-                value:
-                  price: 39.99
-                  description: "Edición especial con mapas y apéndices"
-              actualizar_multiple:
-                summary: Actualizar múltiples campos
-                value:
-                  title: "El Señor de los Anillos - Edición Definitiva"
-                  price: 45.99
-                  description: "Edición definitiva con ilustraciones originales"
-                  publishedDate: "2004-10-21"
-      responses:
-        '200':
-          description: Libro actualizado exitosamente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UpdateBookResponse'
-              example:
-                message: "Book updated successfully"
-                book:
-                  id: "550e8400-e29b-41d4-a716-446655440000"
-                  title: "El Señor de los Anillos - Edición Especial"
-                  author: "J.R.R. Tolkien"
-                  isbn: "978-84-450-7054-9"
-                  price: 39.99
-                  description: "Edición especial con mapas y apéndices"
-                  publishedDate: "1954-07-29"
-                  createdAt: "2024-01-15T10:30:00.000Z"
-                  updatedAt: "2024-01-15T11:45:00.000Z"
-                updatedFields: ["title", "price", "description"]
-                stage: "dev"
-        '400':
-          description: Error de validación o datos inválidos
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationErrorResponse'
-              example:
-                error: "Validation Error"
-                message: "Los datos proporcionados no son válidos"
-                details:
-                  - field: "price"
-                    message: "El precio debe ser un número positivo"
-        '404':
-          description: Libro no encontrado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                error: "Not Found"
-                message: "Book not found with the provided ID"
-        '405':
-          description: Método no permitido
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                error: "Method Not Allowed"
-                message: "Only PUT method is allowed"
-        '500':
-          description: Error interno del servidor
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                error: "Internal Server Error"
-                message: "An error occurred while updating the book"
-
     post:
       summary: Crear un nuevo libro
       description: Crea un nuevo libro en la base de datos con validación robusta
@@ -353,6 +254,220 @@ paths:
               example:
                 error: "Internal Server Error"
                 message: "An error occurred while creating the book"
+
+  /books/{id}:
+    put:
+      summary: Actualizar un libro existente
+      description: Actualiza un libro existente por su ID con validación de campos opcionales
+      operationId: updateBook
+      tags:
+        - Books
+      parameters:
+        - name: id
+          in: path
+          description: ID del libro a actualizar
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBookRequest'
+            examples:
+              actualizar_titulo:
+                summary: Actualizar solo el título
+                value:
+                  title: "El Señor de los Anillos - Edición Especial"
+              actualizar_precio:
+                summary: Actualizar precio y descripción
+                value:
+                  price: 39.99
+                  description: "Edición especial con mapas y apéndices"
+              actualizar_multiple:
+                summary: Actualizar múltiples campos
+                value:
+                  title: "El Señor de los Anillos - Edición Definitiva"
+                  price: 45.99
+                  description: "Edición definitiva con ilustraciones originales"
+                  publishedDate: "2004-10-21"
+      responses:
+        '200':
+          description: Libro actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateBookResponse'
+              example:
+                message: "Book updated successfully"
+                book:
+                  id: "550e8400-e29b-41d4-a716-446655440000"
+                  title: "El Señor de los Anillos - Edición Especial"
+                  author: "J.R.R. Tolkien"
+                  isbn: "978-84-450-7054-9"
+                  price: 39.99
+                  description: "Edición especial con mapas y apéndices"
+                  publishedDate: "1954-07-29"
+                  createdAt: "2024-01-15T10:30:00.000Z"
+                  updatedAt: "2024-01-15T11:45:00.000Z"
+                updatedFields: ["title", "price", "description"]
+                stage: "dev"
+        '400':
+          description: Error de validación o datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+              example:
+                error: "Validation Error"
+                message: "Los datos proporcionados no son válidos"
+                details:
+                  - field: "price"
+                    message: "El precio debe ser un número positivo"
+        '404':
+          description: Libro no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Not Found"
+                message: "Book not found with the provided ID"
+        '405':
+          description: Método no permitido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Method Not Allowed"
+                message: "Only PUT method is allowed"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Internal Server Error"
+                message: "An error occurred while updating the book"
+
+    get:
+      summary: Obtener un libro por ID
+      description: Obtiene un libro específico de la base de datos por su ID único
+      operationId: getBookById
+      tags:
+        - Books
+      parameters:
+        - name: id
+          in: path
+          description: ID único del libro
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Libro obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetBookByIdResponse'
+              example:
+                message: "Book retrieved successfully"
+                book:
+                  id: "550e8400-e29b-41d4-a716-446655440000"
+                  title: "El Señor de los Anillos"
+                  author: "J.R.R. Tolkien"
+                  isbn: "978-84-450-7054-9"
+                  price: 29.99
+                  description: "Una épica historia de fantasía que sigue las aventuras de Frodo Bolsón"
+                  publishedDate: "1954-07-29"
+                  createdAt: "2024-01-15T10:30:00.000Z"
+                  updatedAt: "2024-01-15T10:30:00.000Z"
+                stage: "dev"
+        '404':
+          description: Libro no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Not Found"
+                message: "Book not found with the provided ID"
+        '405':
+          description: Método no permitido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Method Not Allowed"
+                message: "Only GET method is allowed"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Internal Server Error"
+                message: "An error occurred while retrieving the book"
+
+    delete:
+      summary: Eliminar un libro por ID
+      description: Elimina un libro específico de la base de datos por su ID único
+      operationId: deleteBook
+      tags:
+        - Books
+      parameters:
+        - name: id
+          in: path
+          description: ID único del libro a eliminar
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Libro eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteBookResponse'
+              example:
+                message: "Book deleted successfully"
+                deletedBookId: "550e8400-e29b-41d4-a716-446655440000"
+                stage: "dev"
+        '404':
+          description: Libro no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Not Found"
+                message: "Book not found with the provided ID"
+        '405':
+          description: Método no permitido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Method Not Allowed"
+                message: "Only DELETE method is allowed"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Internal Server Error"
+                message: "An error occurred while deleting the book"
 
 components:
   schemas:
@@ -594,6 +709,47 @@ components:
         - totalCount
         - filters
         - pagination
+        - stage
+
+    GetBookByIdResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensaje de confirmación
+          example: "Book retrieved successfully"
+        book:
+          $ref: '#/components/schemas/Book'
+        stage:
+          type: string
+          enum: [dev, prod]
+          description: Stage del entorno
+          example: "dev"
+      required:
+        - message
+        - book
+        - stage
+
+    DeleteBookResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensaje de confirmación
+          example: "Book deleted successfully"
+        deletedBookId:
+          type: string
+          format: uuid
+          description: ID del libro eliminado
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        stage:
+          type: string
+          enum: [dev, prod]
+          description: Stage del entorno
+          example: "dev"
+      required:
+        - message
+        - deletedBookId
         - stage
 
     ErrorResponse:

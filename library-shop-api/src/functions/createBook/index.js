@@ -42,6 +42,7 @@ exports.handler = async (event) => {
         const now = new Date().toISOString();
         const book = {
             id: uuidv4(),
+            publishedDate: new Date(validatedData.publishedDate).toISOString(),
             ...validatedData,
             createdAt: now,
             updatedAt: now
