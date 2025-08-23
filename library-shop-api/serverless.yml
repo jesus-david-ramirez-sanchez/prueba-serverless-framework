@@ -7,7 +7,73 @@ provider:
   runtime: nodejs20.x
   region: us-east-1
   profile: default
+  stage: ${opt:stage, 'dev'}
+  environment:
+    STAGE: ${self:provider.stage}
+    BOOKS_TABLE_NAME: ${self:service}-books-${self:provider.stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:Query
+            - dynamodb:Scan
+          Resource: 
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-books-${self:provider.stage}"
 
 functions:
-  hello:
-    handler: src/functions/handler.handler
+  createBook:
+    handler: src/functions/createBook/index.handler
+    events:
+      - http:
+          path: /books
+          method: post
+          cors: true
+    environment:
+      BOOKS_TABLE_NAME: ${self:provider.environment.BOOKS_TABLE_NAME}
+      STAGE: ${self:provider.environment.STAGE}
+
+resources:
+  Resources:
+    BooksTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.BOOKS_TABLE_NAME}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: isbn
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: isbn-index
+            KeySchema:
+              - AttributeName: isbn
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        Tags:
+          - Key: Environment
+            Value: ${self:provider.stage}
+          - Key: Service
+            Value: ${self:service}
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 3000
+    lambdaPort: 3002
+  webpack:
+    webpackConfig: webpack.config.js
+    includeModules: true
+    packager: 'npm'
