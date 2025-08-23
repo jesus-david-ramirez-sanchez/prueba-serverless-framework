@@ -10,6 +10,7 @@
         "remove": "serverless remove",
         "logs": "serverless logs -f createBook -t",
         "logs:get": "serverless logs -f getBooks -t",
+        "logs:update": "serverless logs -f updateBook -t",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": ["serverless", "aws", "lambda", "javascript"],

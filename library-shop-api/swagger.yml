@@ -141,6 +141,105 @@ paths:
                 error: "Method Not Allowed"
                 message: "Only GET method is allowed"
         '500':
+           description: Error interno del servidor
+           content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/ErrorResponse'
+               example:
+                 error: "Internal Server Error"
+                 message: "An error occurred while processing the request"
+
+  /books/{id}:
+    put:
+      summary: Actualizar un libro existente
+      description: Actualiza un libro existente por su ID con validación de campos opcionales
+      operationId: updateBook
+      tags:
+        - Books
+      parameters:
+        - name: id
+          in: path
+          description: ID del libro a actualizar
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBookRequest'
+            examples:
+              actualizar_titulo:
+                summary: Actualizar solo el título
+                value:
+                  title: "El Señor de los Anillos - Edición Especial"
+              actualizar_precio:
+                summary: Actualizar precio y descripción
+                value:
+                  price: 39.99
+                  description: "Edición especial con mapas y apéndices"
+              actualizar_multiple:
+                summary: Actualizar múltiples campos
+                value:
+                  title: "El Señor de los Anillos - Edición Definitiva"
+                  price: 45.99
+                  description: "Edición definitiva con ilustraciones originales"
+                  publishedDate: "2004-10-21"
+      responses:
+        '200':
+          description: Libro actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateBookResponse'
+              example:
+                message: "Book updated successfully"
+                book:
+                  id: "550e8400-e29b-41d4-a716-446655440000"
+                  title: "El Señor de los Anillos - Edición Especial"
+                  author: "J.R.R. Tolkien"
+                  isbn: "978-84-450-7054-9"
+                  price: 39.99
+                  description: "Edición especial con mapas y apéndices"
+                  publishedDate: "1954-07-29"
+                  createdAt: "2024-01-15T10:30:00.000Z"
+                  updatedAt: "2024-01-15T11:45:00.000Z"
+                updatedFields: ["title", "price", "description"]
+                stage: "dev"
+        '400':
+          description: Error de validación o datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+              example:
+                error: "Validation Error"
+                message: "Los datos proporcionados no son válidos"
+                details:
+                  - field: "price"
+                    message: "El precio debe ser un número positivo"
+        '404':
+          description: Libro no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Not Found"
+                message: "Book not found with the provided ID"
+        '405':
+          description: Método no permitido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Method Not Allowed"
+                message: "Only PUT method is allowed"
+        '500':
           description: Error interno del servidor
           content:
             application/json:
@@ -148,7 +247,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 error: "Internal Server Error"
-                message: "An error occurred while processing the request"
+                message: "An error occurred while updating the book"
 
     post:
       summary: Crear un nuevo libro
@@ -370,8 +469,74 @@ components:
           description: Stage del entorno donde se creó el libro
           example: "dev"
       required:
+         - message
+         - book
+         - stage
+
+    UpdateBookRequest:
+      type: object
+      minProperties: 1
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Título del libro (opcional)
+          example: "El Señor de los Anillos - Edición Especial"
+        author:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Autor del libro (opcional)
+          example: "J.R.R. Tolkien"
+        isbn:
+          type: string
+          pattern: '^[0-9-]{10,17}$'
+          description: "ISBN del libro (opcional)"
+          example: "978-84-450-7054-9"
+        price:
+          type: number
+          minimum: 0.01
+          maximum: 999999.99
+          multipleOf: 0.01
+          description: Precio del libro (opcional)
+          example: 39.99
+        description:
+          type: string
+          maxLength: 1000
+          description: Descripción del libro (opcional)
+          example: "Edición especial con mapas y apéndices"
+        publishedDate:
+          type: string
+          format: date
+          description: Fecha de publicación en formato ISO (YYYY-MM-DD) (opcional)
+          example: "1954-07-29"
+      additionalProperties: false
+
+    UpdateBookResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensaje de confirmación
+          example: "Book updated successfully"
+        book:
+          $ref: '#/components/schemas/Book'
+        updatedFields:
+          type: array
+          items:
+            type: string
+          description: Lista de campos que fueron actualizados
+          example: ["title", "price", "description"]
+        stage:
+          type: string
+          enum: [dev, prod]
+          description: Stage del entorno
+          example: "dev"
+      required:
         - message
         - book
+        - updatedFields
         - stage
 
     GetBooksResponse:

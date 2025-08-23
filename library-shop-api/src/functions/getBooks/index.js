@@ -1,9 +1,6 @@
-const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, GetCommand, QueryCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
-
-// Configuración del cliente DynamoDB
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
+const { validateSearchParams, validateBookId } = require('./validations');
+const { getBookById, getBooks } = require('./database');
+const GetBooksResponseHandler = require('./responseHandler');
 
 exports.handler = async (event) => {
     try {
@@ -17,22 +14,19 @@ exports.handler = async (event) => {
 
         // Validar que sea una petición GET
         if (event.httpMethod !== 'GET') {
-            return {
-                statusCode: 405,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*',
-                },
-                body: JSON.stringify({
-                    error: 'Method Not Allowed',
-                    message: 'Only GET method is allowed'
-                })
-            };
+            return GetBooksResponseHandler.methodNotAllowed();
         }
 
-        // Obtener parámetros de query
+        // Obtener y validar parámetros de query
         const queryParams = event.queryStringParameters || {};
-        const { id, author, title, limit = '10', offset = '0' } = queryParams;
+        let validatedParams;
+        try {
+            validatedParams = validateSearchParams(queryParams);
+        } catch (validationError) {
+            return GetBooksResponseHandler.validationError(validationError.details);
+        }
+
+        const { id, author, title, limit, offset } = validatedParams;
 
         let books = [];
         let totalCount = 0;
@@ -40,177 +34,59 @@ exports.handler = async (event) => {
         // Si se proporciona un ID específico, buscar por ID
         if (id) {
             try {
-                const getCommand = new GetCommand({
-                    TableName: tableName,
-                    Key: { id: id }
-                });
-
-                const result = await docClient.send(getCommand);
+                // Validar formato del ID
+                validateBookId(id);
                 
-                if (result.Item) {
-                    books = [result.Item];
+                const book = await getBookById(tableName, id);
+                
+                if (book) {
+                    books = [book];
                     totalCount = 1;
                 } else {
-                    return {
-                        statusCode: 404,
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Access-Control-Allow-Origin': '*',
-                        },
-                        body: JSON.stringify({
-                            error: 'Not Found',
-                            message: 'Book not found with the provided ID'
-                        })
-                    };
+                    return GetBooksResponseHandler.notFound();
                 }
             } catch (error) {
                 console.error('Error getting book by ID:', error);
-                return {
-                    statusCode: 500,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*',
-                    },
-                    body: JSON.stringify({
-                        error: 'Internal Server Error',
-                        message: 'An error occurred while retrieving the book'
-                    })
-                };
+                return GetBooksResponseHandler.internalServerError('An error occurred while retrieving the book');
             }
-        } 
-        // Si se proporciona author, buscar por author usando Scan
-        else if (author) {
+        } else {
+            // Buscar libros con filtros
             try {
-                const scanCommand = new ScanCommand({
-                    TableName: tableName,
-                    FilterExpression: 'contains(#author, :author)',
-                    ExpressionAttributeNames: {
-                        '#author': 'author'
-                    },
-                    ExpressionAttributeValues: {
-                        ':author': author
-                    },
-                    Limit: parseInt(limit),
-                    ExclusiveStartKey: offset !== '0' ? { id: offset } : undefined
-                });
-
-                const result = await docClient.send(scanCommand);
-                books = result.Items || [];
-                totalCount = books.length;
-            } catch (error) {
-                console.error('Error scanning books by author:', error);
-                return {
-                    statusCode: 500,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*',
-                    },
-                    body: JSON.stringify({
-                        error: 'Internal Server Error',
-                        message: 'An error occurred while searching books by author'
-                    })
+                const filters = {
+                    author,
+                    title,
+                    limit: parseInt(limit),
+                    exclusiveStartKey: offset !== 0 ? { id: offset.toString() } : undefined
                 };
-            }
-        } 
-        // Si se proporciona title, buscar por title usando Scan
-        else if (title) {
-            try {
-                const scanCommand = new ScanCommand({
-                    TableName: tableName,
-                    FilterExpression: 'contains(#title, :title)',
-                    ExpressionAttributeNames: {
-                        '#title': 'title'
-                    },
-                    ExpressionAttributeValues: {
-                        ':title': title
-                    },
-                    Limit: parseInt(limit),
-                    ExclusiveStartKey: offset !== '0' ? { id: offset } : undefined
-                });
 
-                const result = await docClient.send(scanCommand);
-                books = result.Items || [];
-                totalCount = books.length;
+                const result = await getBooks(tableName, filters);
+                books = result.items;
+                totalCount = result.count;
             } catch (error) {
-                console.error('Error scanning books by title:', error);
-                return {
-                    statusCode: 500,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*',
-                    },
-                    body: JSON.stringify({
-                        error: 'Internal Server Error',
-                        message: 'An error occurred while searching books by title'
-                    })
-                };
-            }
-        } 
-        // Si no se proporcionan filtros, obtener todos los libros
-        else {
-            try {
-                const scanCommand = new ScanCommand({
-                    TableName: tableName,
-                    Limit: parseInt(limit),
-                    ExclusiveStartKey: offset !== '0' ? { id: offset } : undefined
-                });
-
-                const result = await docClient.send(scanCommand);
-                books = result.Items || [];
-                totalCount = books.length;
-            } catch (error) {
-                console.error('Error scanning all books:', error);
-                return {
-                    statusCode: 500,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*',
-                    },
-                    body: JSON.stringify({
-                        error: 'Internal Server Error',
-                        message: 'An error occurred while retrieving books'
-                    })
-                };
+                console.error('Error getting books:', error);
+                return GetBooksResponseHandler.internalServerError();
             }
         }
 
         // Respuesta exitosa
-        return {
-            statusCode: 200,
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
+        return GetBooksResponseHandler.success({
+            message: 'Books retrieved successfully',
+            books: books,
+            totalCount: totalCount,
+            filters: {
+                id: id || null,
+                author: author || null,
+                title: title || null
             },
-            body: JSON.stringify({
-                message: 'Books retrieved successfully',
-                books: books,
-                totalCount: totalCount,
-                filters: {
-                    id: id || null,
-                    author: author || null,
-                    title: title || null
-                },
-                pagination: {
-                    limit: parseInt(limit),
-                    offset: parseInt(offset)
-                },
-                stage: stage
-            })
-        };
+            pagination: {
+                limit: parseInt(limit),
+                offset: parseInt(offset)
+            },
+            stage: stage
+        });
 
     } catch (error) {
         console.error('Error in getBooks handler:', error);
-        
-        return {
-            statusCode: 500,
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-            },
-            body: JSON.stringify({
-                error: 'Internal Server Error',
-                message: 'An error occurred while processing the request'
-            })
-        };
+        return GetBooksResponseHandler.internalServerError();
     }
 };

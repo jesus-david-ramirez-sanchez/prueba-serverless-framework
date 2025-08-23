@@ -58,6 +58,7 @@ La API está desplegada y funcionando en AWS:
 **Endpoints disponibles:**
 - **POST** `/books` - Crear libro
 - **GET** `/books` - Obtener libros (con filtros opcionales)
+- **PUT** `/books/{id}` - Actualizar libro por ID
 
 **Ejemplo de uso:**
 ```bash
@@ -71,7 +72,11 @@ curl https://so95kgzpoc.execute-api.us-east-1.amazonaws.com/dev/books
 
 # Filtrar por autor
 curl "https://so95kgzpoc.execute-api.us-east-1.amazonaws.com/dev/books?author=Test"
-```
+
+# Actualizar un libro
+curl -X PUT https://so95kgzpoc.execute-api.us-east-1.amazonaws.com/dev/books/7b34defa-f6bb-40e3-b50e-ebb3d751c5bc \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Updated Book Title","price":25.99}'
 
 ## Ejecutar con Docker
 
@@ -95,6 +100,44 @@ npm run docker:compose:down
 
 La Lambda estará disponible en `http://localhost:9000` y DynamoDB en `http://localhost:8000`
 
+## Arquitectura del Proyecto
+
+El proyecto sigue una arquitectura modular donde cada función Lambda es completamente independiente:
+
+### Estructura por Función
+
+Cada función Lambda tiene su propia carpeta con todos los archivos necesarios:
+
+1. **`index.js`** - Handler principal de la función
+   - Maneja las peticiones HTTP
+   - Coordina la lógica de negocio
+   - Retorna respuestas HTTP
+
+2. **`validations.js`** - Validaciones específicas de la función
+   - Esquemas de validación con Joi
+   - Validación de datos de entrada
+   - Mensajes de error en español
+   - Funciones de validación específicas
+
+3. **`database.js`** - Operaciones de base de datos específicas
+   - Métodos específicos para la función
+   - Operaciones DynamoDB necesarias
+   - Manejo de errores de base de datos
+
+4. **`responseHandler.js`** - Manejador de respuestas específico
+   - Respuestas HTTP estandarizadas
+   - Manejo de errores específicos
+   - Headers CORS configurados
+
+### Beneficios de la Arquitectura
+
+- ✅ **Funciones completamente independientes**
+- ✅ **Fácil mantenimiento y debugging**
+- ✅ **Código específico para cada función**
+- ✅ **Fácil testing individual**
+- ✅ **Escalabilidad por función**
+- ✅ **Sin dependencias compartidas**
+
 ## Documentación
 
 ### API Documentation
@@ -102,6 +145,14 @@ La documentación de la API está disponible en el archivo `swagger.yml` en form
 
 ### Database Schema
 La estructura completa de la tabla DynamoDB está documentada en `dynamodb-schema.md`, incluyendo:
+
+### Architecture
+La arquitectura del proyecto está documentada en `ARCHITECTURE.md`, incluyendo:
+- Estructura de capas y responsabilidades
+- Patrones de diseño utilizados
+- Flujo de datos y desarrollo
+- Convenciones de código
+- Guías para testing
 - Esquema de la tabla y índices
 - Estructura de datos de los libros
 - Operaciones soportadas
@@ -204,6 +255,45 @@ GET /books?limit=5&offset=10
 }
 ```
 
+### Actualizar Libro
+
+**PUT** `/books/{id}`
+
+**Parámetros de path:**
+- `id`: ID del libro a actualizar (UUID)
+
+**Body (campos opcionales):**
+```json
+{
+  "title": "Nuevo título del libro",
+  "author": "Nuevo autor",
+  "isbn": "978-84-450-7054-9",
+  "price": 29.99,
+  "description": "Nueva descripción",
+  "publishedDate": "1954-07-29"
+}
+```
+
+**Respuesta exitosa (200):**
+```json
+{
+  "message": "Book updated successfully",
+  "book": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "title": "Nuevo título del libro",
+    "author": "J.R.R. Tolkien",
+    "isbn": "978-84-450-7054-9",
+    "price": 29.99,
+    "description": "Nueva descripción",
+    "publishedDate": "1954-07-29",
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "updatedAt": "2024-01-15T11:45:00.000Z"
+  },
+  "updatedFields": ["title", "price", "description"],
+  "stage": "dev"
+}
+```
+
 ### Crear Libro
 
 **POST** `/books`
@@ -248,9 +338,20 @@ library-shop-api/
 ├── src/
 │   └── functions/
 │       ├── createBook/
-│       │   └── index.js
-│       └── getBooks/
-│           └── index.js
+│       │   ├── index.js
+│       │   ├── validations.js
+│       │   ├── database.js
+│       │   └── responseHandler.js
+│       ├── getBooks/
+│       │   ├── index.js
+│       │   ├── validations.js
+│       │   ├── database.js
+│       │   └── responseHandler.js
+│       └── updateBook/
+│           ├── index.js
+│           ├── validations.js
+│           ├── database.js
+│           └── responseHandler.js
 ├── serverless.yml
 ├── package.json
 ├── swagger.yml
@@ -267,6 +368,7 @@ library-shop-api/
 - `npm run remove`: Eliminar recursos de AWS
 - `npm run logs`: Ver logs de la función createBook
 - `npm run logs:get`: Ver logs de la función getBooks
+- `npm run logs:update`: Ver logs de la función updateBook
 - `npm run docker:build`: Construir imagen Docker (no disponible en esta versión)
 - `npm run docker:run`: Ejecutar contenedor Docker (no disponible en esta versión)
 - `npm run docker:compose`: Ejecutar stack completo con Docker Compose (no disponible en esta versión)
@@ -276,7 +378,7 @@ library-shop-api/
 
 Al desplegar, se crearán los siguientes recursos en AWS:
 
-- **Lambda Functions**: `createBook`, `getBooks`
+- **Lambda Functions**: `createBook`, `getBooks`, `updateBook`
 - **API Gateway**: Endpoints REST
 - **DynamoDB Table**: `library-shop-api-books-{stage}`
 - **IAM Roles**: Permisos necesarios para DynamoDB
