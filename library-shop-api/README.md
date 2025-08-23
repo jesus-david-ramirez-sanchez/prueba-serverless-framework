@@ -7,7 +7,7 @@ API para gestión de libros construida con Serverless Framework y AWS Lambda.
 - ✅ Creación de libros con validación robusta usando Joi
 - ✅ Almacenamiento en DynamoDB
 - ✅ Variables de entorno por stage (dev/prod)
-- ✅ TypeScript
+- ✅ JavaScript (Node.js)
 - ✅ CORS habilitado
 - ✅ Validación de datos de entrada con mensajes en español
 - ✅ Documentación completa con Swagger/OpenAPI (YAML)
@@ -58,6 +58,28 @@ npm run dev
 ```
 
 Esto iniciará el servidor en `http://localhost:3000`
+
+## Ejecutar con Docker
+
+### Opción 1: Solo la Lambda
+```bash
+# Construir la imagen
+npm run docker:build
+
+# Ejecutar el contenedor
+npm run docker:run
+```
+
+### Opción 2: Con DynamoDB local
+```bash
+# Ejecutar todo el stack (Lambda + DynamoDB local)
+npm run docker:compose
+
+# Detener los servicios
+npm run docker:compose:down
+```
+
+La Lambda estará disponible en `http://localhost:9000` y DynamoDB en `http://localhost:8000`
 
 ## Documentación de la API
 
@@ -142,23 +164,24 @@ library-shop-api/
 ├── src/
 │   └── functions/
 │       └── createBook/
-│           └── index.ts
+│           └── index.js
 ├── serverless.yml
 ├── package.json
-├── tsconfig.json
-├── webpack.config.js
 ├── swagger.yml
 └── README.md
 ```
 
 ## Comandos Útiles
 
-- `npm run build`: Compilar TypeScript
+
 - `npm run deploy`: Desplegar a AWS
 - `npm run deploy:dev`: Desplegar a desarrollo
 - `npm run deploy:prod`: Desplegar a producción
 - `npm run remove`: Eliminar recursos de AWS
 - `npm run logs`: Ver logs de la función createBook
+- `npm run docker:build`: Construir imagen Docker
+- `npm run docker:run`: Ejecutar contenedor Docker
+- `npm run docker:compose`: Ejecutar stack completo con Docker Compose
 
 
 ## Recursos Creados
@@ -179,8 +202,7 @@ Asegúrate de que tu usuario AWS tenga permisos para:
 - DynamoDB
 - IAM (para crear roles)
 
-### Error de compilación TypeScript
-Ejecuta `npm run build` para verificar que no hay errores de compilación.
+
 
 ### Error de conexión a DynamoDB
 Verifica que la región en `serverless.yml` coincida con tu configuración de AWS.

@@ -1,8 +1,7 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
-import { v4 as uuidv4 } from 'uuid';
-import Joi from 'joi';
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
+const { v4: uuidv4 } = require('uuid');
+const Joi = require('joi');
 
 // Configuración del cliente DynamoDB
 const client = new DynamoDBClient({});
@@ -42,27 +41,7 @@ const bookSchema = Joi.object({
     })
 });
 
-// Interfaz para el libro
-interface Book {
-    id: string;
-    title: string;
-    author: string;
-    isbn: string;
-    price: number;
-    description?: string;
-    publishedDate?: string;
-    createdAt: string;
-    updatedAt: string;
-}
-
-// Interfaz para la respuesta de error
-interface ErrorResponse {
-    error: string;
-    message: string;
-    details?: any;
-}
-
-export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+exports.handler = async (event) => {
     try {
         // Obtener variables de entorno
         const tableName = process.env.BOOKS_TABLE_NAME;
@@ -83,7 +62,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
                 body: JSON.stringify({
                     error: 'Method Not Allowed',
                     message: 'Only POST method is allowed'
-                } as ErrorResponse)
+                })
             };
         }
 
@@ -98,7 +77,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
                 body: JSON.stringify({
                     error: 'Bad Request',
                     message: 'Request body is required'
-                } as ErrorResponse)
+                })
             };
         }
 
@@ -115,7 +94,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
                 body: JSON.stringify({
                     error: 'Bad Request',
                     message: 'Invalid JSON in request body'
-                } as ErrorResponse)
+                })
             };
         }
 
@@ -141,13 +120,13 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
                     error: 'Validation Error',
                     message: 'Los datos proporcionados no son válidos',
                     details: errorDetails
-                } as ErrorResponse)
+                })
             };
         }
 
         // Crear el objeto del libro con los datos validados
         const now = new Date().toISOString();
-        const book: Book = {
+        const book = {
             id: uuidv4(),
             title: value.title,
             author: value.author,
@@ -194,7 +173,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
             body: JSON.stringify({
                 error: 'Internal Server Error',
                 message: 'An error occurred while creating the book'
-            } as ErrorResponse)
+            })
         };
     }
 };

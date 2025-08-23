@@ -155,7 +155,7 @@ components:
         isbn:
           type: string
           pattern: '^[0-9-]{10,17}$'
-          description: ISBN del libro (formato: números y guiones, 10-17 caracteres)
+          description: "ISBN del libro (formato: números y guiones, 10-17 caracteres)"
           example: "978-84-450-7054-9"
         price:
           type: number

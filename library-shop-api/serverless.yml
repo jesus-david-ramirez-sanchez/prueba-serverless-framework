@@ -66,14 +66,9 @@ resources:
             Value: ${self:service}
 
 plugins:
-  - serverless-webpack
   - serverless-offline
 
 custom:
   serverless-offline:
     httpPort: 3000
     lambdaPort: 3002
-  webpack:
-    webpackConfig: webpack.config.js
-    includeModules: true
-    packager: 'npm'
