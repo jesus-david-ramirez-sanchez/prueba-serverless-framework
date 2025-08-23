@@ -95,9 +95,18 @@ npm run docker:compose:down
 
 La Lambda estará disponible en `http://localhost:9000` y DynamoDB en `http://localhost:8000`
 
-## Documentación de la API
+## Documentación
 
+### API Documentation
 La documentación de la API está disponible en el archivo `swagger.yml` en formato OpenAPI 3.0.3.
+
+### Database Schema
+La estructura completa de la tabla DynamoDB está documentada en `dynamodb-schema.md`, incluyendo:
+- Esquema de la tabla y índices
+- Estructura de datos de los libros
+- Operaciones soportadas
+- Comandos AWS CLI para consultas
+- Consideraciones de rendimiento y optimizaciones futuras
 
 Esta documentación incluye:
 - Esquemas completos de request/response
@@ -245,6 +254,7 @@ library-shop-api/
 ├── serverless.yml
 ├── package.json
 ├── swagger.yml
+├── dynamodb-schema.md
 └── README.md
 ```
 
