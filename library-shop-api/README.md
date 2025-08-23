@@ -151,61 +151,13 @@ El proyecto utiliza variables de entorno que se configuran automáticamente:
 
 ## 📖 Uso de la API
 
-### 1. Crear un Libro
+Para ejemplos detallados de consumo de la API, consulta la documentación completa en el archivo `swagger.yml` que incluye:
 
-```bash
-curl -X POST https://your-api-gateway-url/dev/books \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "El Señor de los Anillos",
-    "author": "J.R.R. Tolkien",
-    "isbn": "978-84-450-7054-9",
-    "price": 29.99,
-    "description": "Una épica historia de fantasía",
-    "publishedDate": "1954-07-29"
-  }'
-```
-
-### 2. Obtener Todos los Libros
-
-```bash
-curl -X GET https://your-api-gateway-url/dev/books
-```
-
-### 3. Obtener Libro por ID
-
-```bash
-curl -X GET "https://your-api-gateway-url/dev/books/book-id-here"
-```
-
-### 4. Buscar Libros por Autor
-
-```bash
-curl -X GET "https://your-api-gateway-url/dev/books?author=Tolkien"
-```
-
-### 5. Buscar Libros por Título
-
-```bash
-curl -X GET "https://your-api-gateway-url/dev/books?title=Anillos"
-```
-
-### 6. Actualizar un Libro
-
-```bash
-curl -X PUT https://your-api-gateway-url/dev/books/book-id-here \
-  -H "Content-Type: application/json" \
-  -d '{
-    "price": 34.99,
-    "description": "Nueva descripción actualizada"
-  }'
-```
-
-### 7. Eliminar un Libro
-
-```bash
-curl -X DELETE https://your-api-gateway-url/dev/books/book-id-here
-```
+- **Ejemplos de requests** para cada endpoint
+- **Esquemas de datos** de entrada y salida
+- **Códigos de respuesta** y manejo de errores
+- **Parámetros de query** y path parameters
+- **Headers requeridos** y opcionales
 
 ## 📊 Estructura de Datos
 
@@ -270,27 +222,7 @@ La documentación completa de la API está disponible en formato OpenAPI/Swagger
 
 ## 🧪 Testing
 
-### Ejemplos de Testing
-
-```bash
-# Test de creación de libro
-curl -X POST https://your-api-gateway-url/dev/books \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Test Book",
-    "author": "Test Author",
-    "isbn": "123-456-789-0",
-    "price": 19.99
-  }'
-
-# Test de validación (debería fallar)
-curl -X POST https://your-api-gateway-url/dev/books \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "",
-    "price": "invalid"
-  }'
-```
+Para ejemplos de testing y casos de uso, consulta la documentación Swagger que incluye ejemplos de requests y respuestas para cada endpoint.
 
 ## 🔒 Seguridad
 
