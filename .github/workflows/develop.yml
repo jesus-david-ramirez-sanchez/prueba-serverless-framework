@@ -20,11 +20,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: 'library-shop-api/package-lock.json'
 
       - name: Install dependencies
-        run: cd library-shop-api && npm install
+        run: |
+          cd library-shop-api
+          npm ci --cache .npm --prefer-offline
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
