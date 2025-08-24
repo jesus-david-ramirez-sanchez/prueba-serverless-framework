@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd library-shop-api
-          npm ci --cache .npm --prefer-offline
+          npm install
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
