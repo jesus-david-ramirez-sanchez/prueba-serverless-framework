@@ -6,7 +6,6 @@ provider:
   name: aws
   runtime: nodejs20.x
   region: us-east-1
-  profile: default
   stage: ${opt:stage, 'dev'}
   environment:
     STAGE: ${self:provider.stage}
