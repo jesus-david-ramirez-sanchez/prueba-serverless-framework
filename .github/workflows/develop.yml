@@ -23,7 +23,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: cd library-shop-api && npm install
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
