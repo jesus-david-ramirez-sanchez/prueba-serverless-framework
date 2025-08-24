@@ -30,6 +30,7 @@ jobs:
         run: |
           cd library-shop-api
           npx serverless config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          echo ${{ secrets.SERVERLESS_ACCESS_KEY }} | npx serverless login --key
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4

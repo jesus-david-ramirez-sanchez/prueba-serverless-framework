@@ -4,10 +4,10 @@
     "description": "API para gestión de libros con Serverless Framework",
     "main": "index.js",
     "scripts": {
-        "deploy": "serverless deploy --offline",
-        "deploy:dev": "serverless deploy --stage dev --offline",
-        "deploy:prod": "serverless deploy --stage prod --offline",
-        "remove": "serverless remove --offline"
+        "deploy": "serverless deploy",
+        "deploy:dev": "serverless deploy --stage dev",
+        "deploy:prod": "serverless deploy --stage prod",
+        "remove": "serverless remove"
     },
     "keywords": ["serverless", "aws", "lambda", "javascript"],
     "author": "",
