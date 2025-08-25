@@ -48,10 +48,23 @@ jobs:
         
     - name: Comentar en PR con resultados de cobertura
       if: github.event_name == 'pull_request'
-      uses: romeovs/lcov-reporter-action@v0.3.1
-      with:
-        lcov-file: library-shop-api/coverage/lcov.info
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd library-shop-api
+        COVERAGE=$(npm run test:coverage --silent | grep -oP 'All files[^|]*\|\s*\K\d+')
+        echo "## 📊 Reporte de Cobertura de Pruebas" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Cobertura total:** $COVERAGE%" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ "$COVERAGE" -lt 80 ]; then
+          echo "❌ **Estado:** Cobertura insuficiente (mínimo 80%)" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "✅ **Estado:** Cobertura aceptable" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📈 **Detalles:**" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        npm run test:coverage --silent | head -20 >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
         
     - name: Verificar umbral de cobertura
       run: |
