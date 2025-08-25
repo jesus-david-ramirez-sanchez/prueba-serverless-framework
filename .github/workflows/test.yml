@@ -26,7 +26,7 @@ jobs:
     - name: Instalar dependencias
       run: |
         cd library-shop-api
-        npm ci
+        npm install
         
     - name: Ejecutar pruebas unitarias
       run: |
