@@ -1,0 +1,68 @@
+name: Pruebas Unitarias
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'library-shop-api/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      
+    - name: Configurar Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: library-shop-api/package-lock.json
+        
+    - name: Instalar dependencias
+      run: |
+        cd library-shop-api
+        npm ci
+        
+    - name: Ejecutar pruebas unitarias
+      run: |
+        cd library-shop-api
+        npm test
+        
+    - name: Generar reporte de cobertura
+      run: |
+        cd library-shop-api
+        npm run test:coverage
+        
+    - name: Subir reporte de cobertura a Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: library-shop-api/coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+        
+    - name: Comentar en PR con resultados de cobertura
+      if: github.event_name == 'pull_request'
+      uses: romeovs/lcov-reporter-action@v0.3.1
+      with:
+        lcov-file: library-shop-api/coverage/lcov.info
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Verificar umbral de cobertura
+      run: |
+        cd library-shop-api
+        # Verificar que la cobertura sea al menos 80%
+        COVERAGE=$(npm run test:coverage --silent | grep -oP 'All files[^|]*\|\s*\K\d+')
+        if [ "$COVERAGE" -lt 80 ]; then
+          echo "❌ Cobertura de código insuficiente: $COVERAGE% (mínimo 80%)"
+          exit 1
+        else
+          echo "✅ Cobertura de código aceptable: $COVERAGE%"
+        fi
