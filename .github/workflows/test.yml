@@ -22,10 +22,10 @@ jobs:
     - name: Checkout código
       uses: actions/checkout@v4
       
-    - name: Configurar Node.js ${{ matrix.node-version }}
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: '20'
         
     - name: Instalar dependencias
       run: |
