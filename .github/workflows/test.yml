@@ -31,7 +31,12 @@ jobs:
     - name: Ejecutar pruebas unitarias
       run: |
         cd library-shop-api
-        npm test
+        npm run test:unit
+        
+    - name: Ejecutar pruebas de integración
+      run: |
+        cd library-shop-api
+        npm run test:integration
         
     - name: Generar reporte de cobertura
       run: |
