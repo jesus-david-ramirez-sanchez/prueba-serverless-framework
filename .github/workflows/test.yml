@@ -22,8 +22,6 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: library-shop-api/package-lock.json
         
     - name: Instalar dependencias
       run: |
