@@ -14,12 +14,22 @@ src/
     │   ├── validations.js     # Validaciones específicas
     │   ├── database.js        # Operaciones DynamoDB
     │   └── responseHandler.js # Manejador de respuestas
-    ├── getBooks/      # Función para obtener libros
+    ├── getAllBooks/   # Función para obtener todos los libros
     │   ├── index.js           # Handler principal
     │   ├── validations.js     # Validaciones específicas
     │   ├── database.js        # Operaciones DynamoDB
     │   └── responseHandler.js # Manejador de respuestas
-    └── updateBook/    # Función para actualizar libros
+    ├── getBookById/   # Función para obtener un libro por ID
+    │   ├── index.js           # Handler principal
+    │   ├── validations.js     # Validaciones específicas
+    │   ├── database.js        # Operaciones DynamoDB
+    │   └── responseHandler.js # Manejador de respuestas
+    ├── updateBook/    # Función para actualizar libros
+    │   ├── index.js           # Handler principal
+    │   ├── validations.js     # Validaciones específicas
+    │   ├── database.js        # Operaciones DynamoDB
+    │   └── responseHandler.js # Manejador de respuestas
+    └── deleteBook/    # Función para eliminar libros
         ├── index.js           # Handler principal
         ├── validations.js     # Validaciones específicas
         ├── database.js        # Operaciones DynamoDB
@@ -299,6 +309,53 @@ const response = CreateBookResponseHandler.success({ data: 'test' });
 | **Escalabilidad** | Limitada | Individual |
 | **Debugging** | Difícil | Fácil |
 | **Despliegue** | Todo junto | Individual |
+
+## 🔍 Detalles por Función
+
+### **createBook**
+- **Endpoint**: `POST /books`
+- **Validaciones**: Campos requeridos (title, author, isbn, price)
+- **Operaciones DB**: `createBook()`
+- **Respuestas**: 201 (creado), 400 (validación), 405 (método)
+
+### **getAllBooks**
+- **Endpoint**: `GET /books`
+- **Validaciones**: Parámetros de query (author, title, limit, offset)
+- **Operaciones DB**: `getAllBooks()`
+- **Respuestas**: 200 (éxito), 400 (validación), 405 (método)
+
+### **getBookById**
+- **Endpoint**: `GET /books/{id}`
+- **Validaciones**: ID en path parameters
+- **Operaciones DB**: `getBookById()`
+- **Respuestas**: 200 (éxito), 404 (no encontrado), 405 (método)
+
+### **updateBook**
+- **Endpoint**: `PUT /books/{id}`
+- **Validaciones**: ID en path, campos opcionales en body
+- **Operaciones DB**: `getBookById()`, `updateBook()`
+- **Respuestas**: 200 (actualizado), 404 (no encontrado), 405 (método)
+
+### **deleteBook**
+- **Endpoint**: `DELETE /books/{id}`
+- **Validaciones**: ID en path
+- **Operaciones DB**: `getBookById()`, `deleteBook()`
+- **Respuestas**: 200 (eliminado), 404 (no encontrado), 405 (método)
+
+## 🛡️ Seguridad y Validación
+
+### **Validaciones Implementadas**
+- **Campos requeridos**: Validación de presencia
+- **Tipos de datos**: Validación de tipos
+- **Longitudes**: Validación de límites
+- **Formatos**: Validación de patrones (ISBN, fechas)
+- **Rangos**: Validación de valores numéricos
+
+### **Manejo de Errores**
+- **Validación**: 400 con detalles específicos
+- **No encontrado**: 404 con mensaje claro
+- **Método no permitido**: 405 con método correcto
+- **Error interno**: 500 con logging
 
 ---
 

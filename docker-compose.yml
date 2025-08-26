@@ -1,0 +1,164 @@
+
+
+services:
+  # DynamoDB Local para pruebas
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    container_name: library-shop-dynamodb
+    ports:
+      - "8000:8000"
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    volumes:
+      - dynamodb_data:/home/dynamodblocal/data
+    environment:
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+    networks:
+      - library-shop-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Servicio para pruebas unitarias
+  unit-tests:
+    build:
+      context: ./library-shop-api
+      dockerfile: Dockerfile.test
+    container_name: library-shop-unit-tests
+    depends_on:
+      dynamodb-local:
+        condition: service_healthy
+    environment:
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+      - AWS_DEFAULT_REGION=us-east-1
+      - DYNAMODB_ENDPOINT=http://dynamodb-local:8000
+      - NODE_ENV=test
+      - STAGE=test
+    volumes:
+      - ./library-shop-api:/app
+      - /app/node_modules
+    networks:
+      - library-shop-network
+    command: ["npm", "run", "test:unit"]
+    profiles:
+      - unit
+      - all
+
+  # Servicio para pruebas de integración
+  integration-tests:
+    build:
+      context: ./library-shop-api
+      dockerfile: Dockerfile.test
+    container_name: library-shop-integration-tests
+    depends_on:
+      dynamodb-local:
+        condition: service_healthy
+    environment:
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+      - AWS_DEFAULT_REGION=us-east-1
+      - DYNAMODB_ENDPOINT=http://dynamodb-local:8000
+      - NODE_ENV=test
+      - STAGE=test
+    volumes:
+      - ./library-shop-api:/app
+      - /app/node_modules
+    networks:
+      - library-shop-network
+    command: ["npm", "run", "test:integration"]
+    profiles:
+      - integration
+      - all
+
+  # Servicio para pruebas con cobertura
+  coverage-tests:
+    build:
+      context: ./library-shop-api
+      dockerfile: Dockerfile.test
+    container_name: library-shop-coverage-tests
+    depends_on:
+      dynamodb-local:
+        condition: service_healthy
+    environment:
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+      - AWS_DEFAULT_REGION=us-east-1
+      - DYNAMODB_ENDPOINT=http://dynamodb-local:8000
+      - NODE_ENV=test
+      - STAGE=test
+    volumes:
+      - ./library-shop-api:/app
+      - /app/node_modules
+      - ./coverage-reports:/app/coverage
+    networks:
+      - library-shop-network
+    command: ["npm", "run", "test:coverage"]
+    profiles:
+      - coverage
+      - all
+
+  # Servicio para todas las pruebas
+  all-tests:
+    build:
+      context: ./library-shop-api
+      dockerfile: Dockerfile.test
+    container_name: library-shop-all-tests
+    depends_on:
+      dynamodb-local:
+        condition: service_healthy
+    environment:
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+      - AWS_DEFAULT_REGION=us-east-1
+      - DYNAMODB_ENDPOINT=http://dynamodb-local:8000
+      - NODE_ENV=test
+      - STAGE=test
+    volumes:
+      - ./library-shop-api:/app
+      - /app/node_modules
+      - ./coverage-reports:/app/coverage
+    networks:
+      - library-shop-network
+    command: ["npm", "run", "test:all"]
+    profiles:
+      - all
+
+  # Servicio para desarrollo local
+  dev-server:
+    build:
+      context: ./library-shop-api
+      dockerfile: Dockerfile.dev
+    container_name: library-shop-dev-server
+    depends_on:
+      dynamodb-local:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+      - AWS_DEFAULT_REGION=us-east-1
+      - DYNAMODB_ENDPOINT=http://dynamodb-local:8000
+      - NODE_ENV=development
+      - STAGE=dev
+      - PORT=3000
+    volumes:
+      - ./library-shop-api:/app
+      - /app/node_modules
+    networks:
+      - library-shop-network
+    command: ["npm", "run", "dev"]
+    profiles:
+      - dev
+
+volumes:
+  dynamodb_data:
+    driver: local
+
+networks:
+  library-shop-network:
+    driver: bridge

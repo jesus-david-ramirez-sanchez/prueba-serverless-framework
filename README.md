@@ -187,6 +187,7 @@ Para ejemplos detallados de consumo de la API, consulta la documentación comple
 
 ## 🔧 Scripts Disponibles
 
+### Scripts de Despliegue
 ```bash
 # Despliegue en desarrollo
 npm run deploy:dev
@@ -200,6 +201,36 @@ npm run logs:dev
 # Eliminar despliegue
 npm run remove:dev
 ```
+
+### Scripts de Testing (Bash)
+
+#### Pruebas Unitarias
+```bash
+# Ejecutar pruebas unitarias
+./run-unit-tests.sh
+```
+
+#### Desarrollo Local con Docker
+```bash
+# Ejecutar el proyecto en modo desarrollo
+./run-all-tests-docker.sh
+```
+
+### Características de los Scripts
+
+#### `run-unit-tests.sh`
+- ✅ **Script simple y directo**
+- ✅ **Verificación automática de prerrequisitos**
+- ✅ **Instalación automática de dependencias**
+- ✅ **Ejecución de pruebas unitarias**
+- ✅ **Feedback claro de éxito o error**
+
+#### `run-all-tests-docker.sh`
+- ✅ **Script simple y directo**
+- ✅ **Verificación automática de prerrequisitos**
+- ✅ **Entorno Docker completo** con DynamoDB Local
+- ✅ **Servidor de desarrollo local** en puerto 3000
+- ✅ **Feedback claro de éxito o error**
 
 ## 📚 Documentación
 
