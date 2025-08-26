@@ -1,0 +1,84 @@
+name: Pruebas Unitarias
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'library-shop-api/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'library-shop-api/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Instalar dependencias
+      run: |
+        cd library-shop-api
+        npm install
+        
+    - name: Ejecutar pruebas unitarias
+      run: |
+        cd library-shop-api
+        npm run test:unit
+        
+    - name: Ejecutar pruebas de integración
+      run: |
+        cd library-shop-api
+        npm run test:integration
+        
+    - name: Generar reporte de cobertura
+      run: |
+        cd library-shop-api
+        npm run test:coverage
+        
+    - name: Subir reporte de cobertura a Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: library-shop-api/coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+        
+    - name: Comentar en PR con resultados de cobertura
+      if: github.event_name == 'pull_request'
+      run: |
+        cd library-shop-api
+        COVERAGE=$(npm run test:coverage --silent | grep -oP 'All files[^|]*\|\s*\K\d+')
+        echo "## 📊 Reporte de Cobertura de Pruebas" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Cobertura total:** $COVERAGE%" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ "$COVERAGE" -lt 80 ]; then
+          echo "❌ **Estado:** Cobertura insuficiente (mínimo 80%)" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "✅ **Estado:** Cobertura aceptable" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📈 **Detalles:**" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        npm run test:coverage --silent | head -20 >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        
+    - name: Verificar umbral de cobertura
+      run: |
+        cd library-shop-api
+        # Verificar que la cobertura sea al menos 80%
+        COVERAGE=$(npm run test:coverage --silent | grep -oP 'All files[^|]*\|\s*\K\d+')
+        if [ "$COVERAGE" -lt 80 ]; then
+          echo "❌ Cobertura de código insuficiente: $COVERAGE% (mínimo 80%)"
+          exit 1
+        else
+          echo "✅ Cobertura de código aceptable: $COVERAGE%"
+        fi
