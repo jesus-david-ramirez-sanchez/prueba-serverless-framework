@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   # DynamoDB Local para pruebas
@@ -16,7 +16,7 @@ services:
     networks:
       - library-shop-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/shell"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
       interval: 30s
       timeout: 10s
       retries: 3

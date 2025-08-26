@@ -14,7 +14,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instalar dependencias (incluyendo devDependencies para desarrollo)
-RUN npm ci && npm cache clean --force
+RUN npm install
 
 # Copiar código fuente
 COPY . .
@@ -33,7 +33,7 @@ ENV AWS_ACCESS_KEY_ID=local
 ENV AWS_SECRET_ACCESS_KEY=local
 ENV AWS_DEFAULT_REGION=us-east-1
 ENV DYNAMODB_ENDPOINT=http://dynamodb-local:8000
-ENV SERVERLESS_ACCESS_KEY=null
+ENV SERVERLESS_ACCESS_KEY=AK0LKMGbdg6aO9K68Gjg2KJ6EJNaS4Qt5TbqCSPj2aNvf
 
 # Comando por defecto para desarrollo
 CMD ["npm", "run", "dev"]
